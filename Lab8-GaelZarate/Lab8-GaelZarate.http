@@ -1,0 +1,6 @@
+@Lab8_GaelZarate_HostAddress = http://localhost:5039
+
+GET {{Lab8_GaelZarate_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
