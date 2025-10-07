@@ -1,23 +1,34 @@
-using Lab8_GaelZarate.Data;      // <- (lo generará el scaffold)
+using Lab8_GaelZarate.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// EF Core + Npgsql (lee la cadena "Pg" desde User Secrets)
+// EF Core + Npgsql
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Pg")));
 
-// Controllers (necesario para los CRUD generados por scaffolding)
+// Controllers
 builder.Services.AddControllers();
 
-// OpenAPI del template .NET 9
+// OpenAPI (del template .NET 9) -> expone /openapi
 builder.Services.AddOpenApi();
+
+// 👇 Necesario para Swagger UI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi(); // mantiene tu /openapi
+    app.MapOpenApi();
+    
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Lab8-GaelZarate API v1");
+        c.RoutePrefix = "swagger"; // URL: /swagger
+    });
 }
 
 app.UseHttpsRedirection();
@@ -42,7 +53,7 @@ app.MapGet("/weatherforecast", () =>
     })
     .WithName("GetWeatherForecast");
 
-// Mapea los controladores (lo necesitaremos al generar CRUD)
+// Controllers CRUD
 app.MapControllers();
 
 app.Run();
